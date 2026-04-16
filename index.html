@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Caseirinhos de Porcelana</title>
+    
+    <!-- Google Font Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            /* Updated font and added subtle gradient background */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle, #fff7fa 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Removed padding, will be handled by container margin */
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 391px;
+            padding: 0 16px;
+            /* Added margin for centering and spacing */
+            margin: 20px auto;
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+            /* Added animation for smooth step transition */
+            animation: fadeInSlideUp 0.5s 0.1s ease-out forwards;
+            opacity: 0; /* Start invisible for animation */
+        }
+        
+        /* Animation class to be added by JS for step-out */
+        .step-out {
+            /* Faster animation */
+            animation: fadeOutSlideUp 0.2s ease-in forwards;
+        }
+
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOutSlideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px); /* Slide up on exit */
+            }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            /* Added subtle gradient and animation */
+            background-color: #f9a8d4;
+            background-image: linear-gradient(-45deg, 
+                rgba(255, 255, 255, 0.2) 25%, 
+                transparent 25%, 
+                transparent 50%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.2) 75%, 
+                transparent 75%, 
+                transparent);
+            background-size: 30px 30px;
+            animation: moveStripes 2s linear infinite;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes moveStripes {
+            from { background-position: 0 0; }
+            to { background-position: 30px 0; }
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+        
+        .title {
+            font-size: 28px;
+            line-height: 34px;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+            margin-bottom: 16px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            line-height: 22px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 24px;
+        }
+        
+        .question {
+            font-size: 18px;
+            line-height: 24px; /* Slightly more space */
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 24px;
+        }
+        
+        .description {
+            font-size: 14px;
+            line-height: 22px; /* Looser line height */
+            color: #000;
+        }
+        
+        .pink-text {
+            color: #f9a8d4;
+        }
+        
+        /* Made highlights chunkier */
+        .highlight-black, .highlight-green, .highlight-pink {
+            padding: 4px 8px;
+            margin: 2px 0;
+            display: inline;
+            /* Handles line breaks gracefully */
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+            border-radius: 4px;
+        }
+        
+        .highlight-black {
+            background-color: #1f2937;
+            color: white;
+        }
+        
+        .highlight-green {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .highlight-pink {
+            background-color: #f9a8d4;
+            color: white;
+        }
+        
+        .blue-banner {
+            background-color: #dbeafe;
+            color: #1e40af;
+            text-align: center;
+            padding: 4px 8px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            line-height: 18px;
+            font-weight: 700;
+            border-radius: 12px; /* Softer radius */
+        }
+        
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px; /* Softer radius */
+            /* Added shadow */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn {
+            width: 100%;
+            min-height: 46px;
+            border: none;
+            border-radius: 12px; /* Softer radius */
+            padding: 12px 16px;
+            font-size: 16px;
+            line-height: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            /* Added shadow and improved transition */
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+        
+        .btn-primary {
+            background-color: #f9a8d4;
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background-color: #f472b6;
+            /* Added hover effects */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 114, 182, 0.3);
+        }
+        
+        .btn-success {
+            background-color: #059669;
+            color: white;
+            /* Added pulse animation */
+            animation: pulseButton 1.75s infinite ease-in-out;
+        }
+        
+        .btn-success:hover {
+            background-color: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(4, 120, 87, 0.4);
+            /* Pause animation on hover */
+            animation-play-state: paused;
+        }
+        
+        /* Keyframes for the CTA pulse */
+        @keyframes pulseButton {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
+            }
+            50% { 
+                transform: scale(1.025); 
+                box-shadow: 0 8px 24px rgba(4, 120, 87, 0.4); 
+            }
+        }
+        
+        /* --- UPDATED OPTION BUTTON STYLES --- */
+        .option-btn {
+            width: 100%;
+            background-color: #f5f3ff; /* Purple bg from reference */
+            border: none; /* No border */
+            border-radius: 12px; /* Softer radius */
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            
+            /* Layout from reference */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            text-align: left;
+            font-family: 'Inter', inherit; /* Ensure font */
+            /* Shadow from reference */
+            box-shadow: 0 4px 12px 0 rgba(100, 100, 100, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .option-btn:hover {
+            background-color: #ede9fe; /* Darker purple */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.2); /* Purple shadow */
+        }
+        
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .option-btn.selected {
+            background-color: #ddd6fe; /* Even darker purple */
+            transform: scale(0.98);
+        }
+        
+        /* NEW wrapper for emoji and text */
+        .option-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-emoji {
+            font-size: 24px; /* Bigger emoji */
+            line-height: 1; /* Align emoji */
+        }
+        
+        .option-text {
+            font-size: 14px;
+            line-height: 17px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        /* NEW style for the arrow */
+        .option-arrow {
+            color: #7c3aed; /* Purple arrow */
+        }
+        
+        .carousel {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .carousel-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .carousel-btn {
+            position: absolute;
+            z-index: 10;
+            /* Made buttons slightly larger */
+            width: 36px;
+            height: 36px;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            /* Added shadow and transition */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .carousel-btn:hover {
+            background-color: #f9fafb;
+            transform: scale(1.1);
+        }
+        
+        .carousel-btn.prev {
+            left: 0;
+        }
+        
+        .carousel-btn.next {
+            right: 0;
+        }
+        
+        .carousel-image {
+            width: 280px;
+            height: 400px;
+            border-radius: 12px; /* Softer radius */
+            overflow: hidden;
+            /* Added shadow */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .carousel-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #d1d5db;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            /* Added transition */
+            transition: all 0.25s ease;
+        }
+        
+        .dot:hover {
+            background-color: #fbcfe8;
+        }
+        
+        .dot.active {
+            background-color: #f9a8d4;
+            /* Added scale effect */
+            transform: scale(1.25);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #fef3c7;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(146, 64, 14, 0.1); /* Added shadow */
+        }
+        
+        .badge-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: #92400e;
+        }
+        
+        .benefits-list {
+            margin-bottom: 24px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px; /* Increased gap */
+            margin-bottom: 12px;
+            font-size: 14px; /* Slightly larger */
+            line-height: 20px;
+        }
+        
+        .check-icon {
+            color: #059669;
+            font-weight: 700;
+            font-size: 16px; /* Bigger check */
+            margin-top: 2px; /* Better alignment */
+        }
+        
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 24px;
+            /* Added visual container */
+            background: #fffcfd;
+            padding: 16px;
+            border-radius: 12px; /* Softer radius */
+            border: 1px solid #fce7f3;
+            font-size: 12px;
+            line-height: 16px;
+        }
+        
+        .bonus-item {
+            margin-bottom: 4px;
+        }
+        
+        .pricing-box {
+            border: 2px solid #059669;
+            border-radius: 12px; /* Softer radius */
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .price-old {
+            font-size: 16px;
+            color: #f9a8d4;
+            text-decoration: line-through;
+        }
+        
+        .price-new {
+            font-size: 32px;
+            color: #059669;
+            font-weight: 700;
+        }
+        
+        .price-installment {
+            font-size: 14px;
+            color: #f9a8d4;
+            margin-top: 8px;
+        }
+        
+        .guarantee-text {
+            font-size: 12px;
+            line-height: 16px;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .testimonial-section {
+            margin-bottom: 24px;
+        }
+        
+        .testimonial-title {
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .community-text {
+            text-align: center;
+            font-size: 14px;
+            color: #f9a8d4;
+            margin-bottom: 8px;
+        }
+        
+        .community-name {
+            text-align: center;
+            font-size: 14px;
+            color: #f9a8d4;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .stats-text {
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 16px;
+        }
+        
+        .guarantee-badge {
+            text-align: center;
+        }
+        
+        .guarantee-badge img {
+            max-width: 100px;
+            height: auto;
+        }
+        
+        .green-box {
+            background-color: #dcfce7;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px; /* Softer radius */
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .green-text {
+            font-size: 14px;
+            line-height: 20px;
+            color: #166534;
+        }
+        
+        .urgency-text {
+            text-align: center;
+            font-size: 14px;
+            line-height: 20px;
+            color: #000;
+            margin-bottom: 24px;
+        }
+        
+        .red-text {
+            color: #dc2626;
+            font-weight: 700;
+        }
+    </style>
+
+    <script>
+    (function () {
+      "use strict";
+
+      var API_BASE = "https://brain-saas.vercel.app";
+      var PIXEL_PUBLIC_KEY = "px_bfv0LWZBjF7oQBDo";
+      var QUIZ_ID = "Porce_1";
+      var TOTAL_STEPS = 7;
+      var START_SEL = "#btn-iniciar-quiz";
+      var FINAL_CTA_SEL = "#btn-checkout-final";
+      var prefix = ["https://lastlink.com","https://kirvano.com","https://pay.kirvano.com","https://checkout.kirvano.com","pay.yampi.com.br"];
+      var TRACK_URL = API_BASE + "/api/track";
+      var QUIZ_TRACK_URL = API_BASE + "/api/quiz/track";
+
+      var firedSteps = {};
+      var firedMeta = {};
+
+      function getCookie(name) {
+        var match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+        return match ? decodeURIComponent(match[2]) : null;
+      }
+
+      function setCookie(name, value, days) {
+        var d = new Date();
+        d.setTime(d.getTime() + (days || 365) * 24 * 60 * 60 * 1000);
+        document.cookie =
+          name + "=" + encodeURIComponent(value) +
+          "; path=/; expires=" + d.toUTCString() + "; SameSite=Lax";
+      }
+
+      function uuid() {
+        if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+          var r = (Math.random() * 16) | 0;
+          var v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      }
+
+      function getOrCreateSid() {
+        var sid = getCookie("mcapi_sid");
+        if (!sid) {
+          sid = uuid();
+          setCookie("mcapi_sid", sid, 365);
+        }
+        return sid;
+      }
+
+      function getQueryParam(name) {
+        try {
+          return new URL(location.href).searchParams.get(name);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function ensureFbp() {
+        var existing = getCookie("_fbp");
+        if (existing) return existing;
+        var fbp = "fb.1." + Date.now() + "." + Math.floor(Math.random() * 1e16);
+        setCookie("_fbp", fbp, 90);
+        return fbp;
+      }
+
+      function ensureFbc() {
+        var existing = getCookie("_fbc");
+        if (existing) return existing;
+        var fbclid = getQueryParam("fbclid");
+        if (!fbclid) return null;
+        var fbc = "fb.1." + Date.now() + "." + fbclid;
+        setCookie("_fbc", fbc, 90);
+        return fbc;
+      }
+
+      function safeResolveUrl(href) {
+        var resolved = href;
+        try { resolved = new URL(href, location.href).href; } catch (e) {}
+        return resolved;
+      }
+
+      function looksLikeCheckout(url) {
+        url = String(url || "");
+        for (var j = 0; j < prefix.length; j++) {
+          if (url.indexOf(prefix[j]) !== -1) return true;
+        }
+        var low = url.toLowerCase();
+        if (low.indexOf("checkout") !== -1 || low.indexOf("pay") !== -1 || low.indexOf("payment") !== -1) return true;
+        return false;
+      }
+
+      function buildUtms() {
+        var r = new URL(location.href);
+        var sid = getOrCreateSid();
+        var out = {};
+        out.utm_source = r.searchParams.get("utm_source") || "direto";
+        out.utm_term = "sid:" + sid;
+        if (r.searchParams.get("utm_medium")) out.utm_medium = r.searchParams.get("utm_medium");
+        if (r.searchParams.get("utm_campaign")) out.utm_campaign = r.searchParams.get("utm_campaign");
+        if (r.searchParams.get("utm_content")) out.utm_content = r.searchParams.get("utm_content");
+        if (r.searchParams.get("fbclid")) out.fbclid = r.searchParams.get("fbclid");
+        return out;
+      }
+
+      function applyUtmsToUrl(resolvedUrl, utms, forceUtmTerm) {
+        try {
+          var u = new URL(resolvedUrl);
+          for (var key in utms) {
+            if (!utms.hasOwnProperty(key)) continue;
+            if (!utms[key]) continue;
+            if (key === "utm_term") {
+              if (forceUtmTerm) u.searchParams.set("utm_term", utms.utm_term);
+              else if (!u.searchParams.get("utm_term")) u.searchParams.set("utm_term", utms.utm_term);
+              continue;
+            }
+            if (!u.searchParams.get(key)) u.searchParams.set(key, utms[key]);
+          }
+          return u.toString();
+        } catch (e) {
+          return resolvedUrl;
+        }
+      }
+
+      function sendTrack(payload) {
+        try {
+          if (navigator.sendBeacon) {
+            var blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+            navigator.sendBeacon(TRACK_URL, blob);
+            return;
+          }
+        } catch (e) {}
+        fetch(TRACK_URL, {
+          method: "POST",
+          mode: "cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }).catch(function () {});
+      }
+
+      function sendQuizEvent(name, stepIndex) {
+        var sid = getOrCreateSid();
+        var utm = buildUtms();
+        var payload = {
+          pixel_id: PIXEL_PUBLIC_KEY,
+          quiz_id: QUIZ_ID,
+          event: name,
+          step_index: stepIndex == null ? null : stepIndex,
+          sid: sid,
+          url: location.href,
+          referrer: typeof document !== "undefined" ? document.referrer || "" : "",
+          utm: utm,
+          fbp: ensureFbp(),
+          fbc: ensureFbc()
+        };
+        try {
+          if (navigator.sendBeacon) {
+            var blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+            navigator.sendBeacon(QUIZ_TRACK_URL, blob);
+            return;
+          }
+        } catch (e) {}
+        fetch(QUIZ_TRACK_URL, {
+          method: "POST",
+          mode: "cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }).catch(function () {});
+      }
+
+      function fireQuizOnce(key, name, stepIndex) {
+        if (firedMeta[key]) return;
+        firedMeta[key] = true;
+        sendQuizEvent(name, stepIndex);
+      }
+
+      function postEvent(eventName) {
+        var sid = getOrCreateSid();
+        var payload = {
+          pixel_id: PIXEL_PUBLIC_KEY,
+          sid: sid,
+          event: eventName,
+          event_id: eventName + "_" + sid + "_" + Date.now(),
+          url: location.href,
+          utm: buildUtms(),
+          fbp: ensureFbp(),
+          fbc: ensureFbc()
+        };
+        sendTrack(payload);
+      }
+
+      function updateLinks() {
+        var utms = buildUtms();
+        var anchors = document.querySelectorAll("a[href]");
+        for (var i = 0; i < anchors.length; i++) {
+          var a = anchors[i];
+          var href = a.getAttribute("href") || "";
+          if (!href) continue;
+          var resolved = safeResolveUrl(href);
+          if (!looksLikeCheckout(resolved)) continue;
+          a.href = applyUtmsToUrl(resolved, utms, true);
+        }
+      }
+
+      function observeQuizSteps() {
+        if (!window.IntersectionObserver) return;
+        var obs = new IntersectionObserver(function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            var en = entries[i];
+            if (!en.isIntersecting || en.intersectionRatio < 0.25) continue;
+            var el = en.target;
+            var raw = el.getAttribute("data-quiz-step");
+            if (!raw) continue;
+            var step = parseInt(raw, 10);
+            if (!step || step < 1 || step > TOTAL_STEPS) continue;
+            var k = "step-" + step;
+            if (firedSteps[k]) continue;
+            firedSteps[k] = true;
+            sendQuizEvent("quiz_step_viewed", step);
+            if (step === TOTAL_STEPS) {
+              fireQuizOnce("last-step", "quiz_last_step_viewed", step);
+            }
+          }
+        }, { threshold: [0, 0.25, 0.5, 1] });
+
+        for (var s = 1; s <= TOTAL_STEPS; s++) {
+          var nodes = document.querySelectorAll('[data-quiz-step="' + s + '"]');
+          for (var n = 0; n < nodes.length; n++) obs.observe(nodes[n]);
+        }
+      }
+
+      function bindStartAndCta() {
+        if (START_SEL) {
+          try {
+            var startEl = document.querySelector(START_SEL);
+            if (startEl) {
+              startEl.addEventListener("click", function () {
+                fireQuizOnce("started", "quiz_started", null);
+              }, true);
+            }
+          } catch (e) {}
+        }
+        if (FINAL_CTA_SEL) {
+          try {
+            var cta = document.querySelector(FINAL_CTA_SEL);
+            if (cta) {
+              cta.addEventListener("click", function () {
+                fireQuizOnce("cta", "quiz_cta_clicked", null);
+                fireQuizOnce("finished", "quiz_finished", null);
+              }, true);
+            }
+          } catch (e) {}
+        }
+      }
+
+      function init() {
+        ensureFbp();
+        updateLinks();
+        postEvent("PageView");
+        sendQuizEvent("quiz_page_view", null);
+
+        var tries = 0;
+        var t = setInterval(function () {
+          tries++;
+          updateLinks();
+          if (tries >= 10) clearInterval(t);
+        }, 1000);
+
+        if (window.MutationObserver) {
+          var mo = new MutationObserver(function () { updateLinks(); });
+          mo.observe(document.documentElement, { childList: true, subtree: true });
+        }
+
+        observeQuizSteps();
+        bindStartAndCta();
+      }
+
+      document.addEventListener("click", function (e) {
+        var el = e.target;
+        var a = el && el.closest ? el.closest("a") : null;
+        if (!a) return;
+        var href = a.getAttribute("href") || "";
+        if (!href) return;
+        var resolved = safeResolveUrl(href);
+        if (!looksLikeCheckout(resolved)) return;
+        var utms = buildUtms();
+        a.href = applyUtmsToUrl(resolved, utms, true);
+        postEvent("InitiateCheckout");
+      }, true);
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Step 0: Intro -->
+        <div class="step active" id="step-0" data-quiz-step="1">
+            <div class="text-center mb-6">
+                <h1 class="title">
+                    <span class="pink-text">Transforme </span>
+                    <span class="highlight-black">BOLO CASEIRINHO</span><br>
+                    <span class="pink-text">em uma </span>
+                    <span class="highlight-green">VERDADEIRA</span> 
+                    <span class="highlight-green">OBRA DE</span><br>
+                    <span class="highlight-green">ARTE LUCRATIVA</span>
+                </h1>
+                <p class="subtitle">
+                    Vou te ensinar a produzir, divulgar, vender e<br>
+                    <strong>LUCRAR DE R$2.000 A R$ 5.000 POR MÊS</strong>
+                </p>
+            </div>
+
+            <div class="image-container">
+                <img src="https://nyroll.shop/wp-content/uploads/2025/10/compressed_image_under_2mb-1-1.webp" 
+                     alt="Bolos decorados"
+                     onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Bolos+Bonitos'">
+            </div>
+
+            <div class="blue-banner">
+                Receitas + Precificação + Vendas
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description">
+                    Descubra o passo a passo para transformar seus<br>
+                    caseirinhos em <strong>verdadeiras obras de arte</strong> que<br>
+                    encantam, valorizam e vendem todos os dias.
+                </p>
+            </div>
+
+            <button id="btn-iniciar-quiz" class="btn btn-primary mb-4" onclick="nextStep()">
+                Quero liberar meu acesso
+            </button>
+
+            <div class="text-center">
+                <p style="font-size: 12px; line-height: 16px; color: #6b7280;">
+                    <strong>Mais de 2 mil alunas já estão lucrando com seus bolos personalizados.</strong> A<br>
+                    próxima história de sucesso pode ser a sua — toque no botão abaixo e<br>
+                    descubra.
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 1: Question 1 -->
+        <div class="step" id="step-1" data-quiz-step="2">
+            <div class="text-center mb-6">
+                <h1 class="question">
+                    Você já faz <span class="pink-text">Caseirinhos</span> pra vender ou esse seria o seu <span class="pink-text">começo</span>?
+                </h1>
+            </div>
+
+            <div class="image-container">
+                <img src="https://cursou.site/wp-content/uploads/2025/08/compressed_image_4.png" 
+                     alt="Mulher sorrindo segurando bolo decorado"
+                     onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Bolos+Bonitos'">
+            </div>
+
+            <div class="text-center mb-4">
+                <p style="font-size: 14px; line-height: 17px; font-weight: 500;">Escolha a opção abaixo</p>
+            </div>
+
+            <!-- --- UPDATED BUTTON HTML --- -->
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">😍</span>
+                    <span class="option-text">Sim, já vendo caseirinhos e quero me destacar ainda mais</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">😐</span>
+                    <span class="option-text">Faço por hobby ou pra família, mas quero começar a vender</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">🤔</span>
+                    <span class="option-text">Ainda não faço, mas quero aprender algo diferente e lucrativo</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </span>
+            </button>
+        </div>
+
+        <!-- Step 2: Question 2 -->
+        <div class="step" id="step-2" data-quiz-step="3">
+            <div class="text-center mb-6">
+                <h1 class="question">
+                    Você já viu alguém vendendo bolos com essa <span class="pink-text">cobertura de porcelana</span> na <span class="highlight-pink">SUA CIDADE</span>?
+                </h1>
+            </div>
+
+            <div class="image-container">
+                <img src="https://cursou.site/wp-content/uploads/2025/08/compressed_image_3.png" 
+                     alt="Mulher decorando bolo com cobertura de porcelana"
+                     onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Bolos+Bonitos'">
+            </div>
+
+            <!-- --- UPDATED BUTTON HTML --- -->
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">👑</span>
+                    <span class="option-text">Nunca vi! Quero ser a primeira!</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">😐</span>
+                    <span class="option-text">Vi sim, mas é bem raro por aqui.</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">🤔</span>
+                    <span class="option-text">Já vi bastante, mas sei que posso fazer diferente.</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </span>
+            </button>
+        </div>
+
+        <!-- Step 3: Info 1 -->
+        <div class="step" id="step-3" data-quiz-step="4">
+            <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso 75%">
+                <div class="progress-fill" style="width: 75%;"></div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 20px; line-height: 24px; font-weight: 700; margin-bottom: 16px;">
+                    Essas coberturas são <span class="highlight-black">muito mais fáceis</span> do que você imagina.
+                </h1>
+            </div>
+
+            <div class="image-container">
+                <img src="https://cursou.site/wp-content/uploads/2025/08/compressed_image_2.png" 
+                     alt="Mulher decorando bolo com cobertura branca e corações vermelhos"
+                     onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Bolos+Bonitos'">
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description mb-4">
+                    Qualquer pessoa pode fazer, <strong>mesmo sem saber desenhar ou ter experiência.</strong>
+                </p>
+                <p class="description">
+                    Eu desenvolvi um passo a passo simples, direto e testado, que ensina exatamente o que você precisa fazer pra transformar qualquer bolo comum em uma verdadeira obra de arte — valorizada e lucrativa.
+                </p>
+            </div>
+
+            <button class="btn btn-primary" onclick="nextStep()">
+                👑 Quero ver como funciona!
+            </button>
+        </div>
+
+        <!-- Step 4: Info 2 -->
+        <div class="step" id="step-4" data-quiz-step="5">
+            <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso 90%">
+                <div class="progress-fill" style="width: 90%;"></div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 20px; line-height: 24px; font-weight: 700;">É mais simples do que você imagina!</h1>
+            </div>
+
+            <div class="image-container">
+                <img src="https://cursou.site/wp-content/uploads/2025/08/compressed_image_5.png" 
+                     alt="Mulher com múltiplos bolos decorados com preços de $50"
+                     onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Bolos+Bonitos'">
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description">
+                    <strong>Mesmo sem experiência</strong>, com o meu método você aprende a fazer coberturas lindas e valorizadas como essa!
+                </p>
+            </div>
+
+            <button class="btn btn-primary" onclick="nextStep()">
+                👑 Quero aprender como fazer isso!
+            </button>
+        </div>
+
+        <!-- Step 5: Testimonials -->
+        <div class="step" id="step-5" data-quiz-step="6">
+            <div class="progress-bar" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso 95%">
+                <div class="progress-fill" style="width: 95%;"></div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 20px; line-height: 24px; font-weight: 700;">Parabéns! Você está no caminho certo.</h1>
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description mb-4">
+                    Milhares de mulheres começaram exatamente como você — com dúvida, curiosidade e vontade de fazer algo diferente.
+                </p>
+                <p class="description mb-4">
+                    Hoje, muitas delas já vendem mais de <strong>10 bolos por semana</strong> e transformaram isso na <strong>sua principal fonte de renda.</strong>
+                </p>
+                <p class="description">
+                    Veja abaixo os depoimentos de confeiteiras reais espalhadas por todo o Brasil.
+                </p>
+            </div>
+
+            <div class="carousel">
+                <div class="carousel-container">
+                    <!-- Updated arrow to SVG icon -->
+                    <button class="carousel-btn prev" onclick="prevSlide()" aria-label="Slide anterior">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="display: block;">
+                            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </button>
+                    <div class="carousel-image">
+                        <img id="carousel-img" src="https://cursou.site/wp-content/uploads/2025/08/3.png" 
+                             alt="Depoimento de aluna"
+                             onerror="this.onerror=null; this.src='https://placehold.co/280x400/fce7f3/db2777?text=Depoimento'">
+                    </div>
+                    <!-- Updated arrow to SVG icon -->
+                    <button class="carousel-btn next" onclick="nextSlide()" aria-label="Próximo slide">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="display: block;">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="carousel-dots">
+                    <button type="button" class="dot active" onclick="goToSlide(0)" aria-label="Ir para slide 1"></button>
+                    <button type="button" class="dot" onclick="goToSlide(1)" aria-label="Ir para slide 2"></button>
+                    <button type="button" class="dot" onclick="goToSlide(2)" aria-label="Ir para slide 3"></button>
+                    <button type="button" class="dot" onclick="goToSlide(3)" aria-label="Ir para slide 4"></button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="nextStep()">
+                Continuar
+            </button>
+        </div>
+
+        <!-- Step 6: Sales Page -->
+        <div class="step" id="step-6" data-quiz-step="7">
+            <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso 100%">
+                <div class="progress-fill" style="width: 100%;"></div>
+            </div>
+
+            <div class="text-center mb-4">
+                <div class="badge">
+                    <span style="font-size: 20px;">🎉</span>
+                    <span class="badge-text">PARABÉNS</span>
+                </div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 18px; line-height: 22px; font-weight: 700; margin-bottom: 8px;">
+                    Seu plano está <span style="color: #059669;">pronto.</span>
+                </h1>
+                <p style="font-size: 14px; line-height: 17px; color: #6b7280;">Leia com atenção</p>
+            </div>
+
+            <!-- This image block below has been removed -->
+            <!-- 
+            <div class="image-container">
+                <img src="https://cursou.site/wp-content/uploads/2025/08/compressed_image_4.png" 
+                     alt="Mulher sorrindo segurando bolo decorado"
+                     onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Bolos+Bonitos'">
+            </div>
+            -->
+
+            <div class="text-center mb-6">
+                <p class="description">
+                    🎉 <strong>Parabéns! Você está prestes a aprender como transformar bolos caseiros em verdadeiras obras de arte e ganhar dinheiro com isso!</strong>
+                </p>
+            </div>
+
+            <div class="green-box">
+                <p class="green-text">
+                    ✅ <strong>E mais:</strong> você foi selecionada para receber uma ferramenta secreta no seu celular que vai te ajudar a vender bolos todos os dias!
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h2 style="font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 16px;">QUAIS BENEFÍCIOS EU VOU TER ?</h2>
+
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Acesso ao Aplicativo (App):</strong> Curso da Confeiteira Mariana - Aulas Gravadas + Materiais de Apoio direto no app para você assistir de onde estiver.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Receitas de Massas Variadas:</strong> Aprenda bases clássicas e descubra como criar variações deliciosas e criativas.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Técnicas de Pintura:</strong> Dê acabamento profissional às suas coberturas com técnicas simples, modernas e encantadoras.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Glacê 2.0 Passo a Passo:</strong> Receita exclusiva com resultado impecável para pintura e decoração.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Aulas de Precificação:</strong> Aprenda a calcular preços corretamente, valorize o seu trabalho e aumente seus lucros.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Utensílios, Pincéis e Dicas Extras:</strong> Saiba exatamente o que usar e como usar para facilitar sua produção.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Novas Aulas Inclusas:</strong> O curso está sempre crescendo e você terá acesso a todos os conteúdos extras sem pagar nada a mais.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Certificado de Conclusão:</strong> Receba seu certificado oficial ao concluir todas as aulas – reconhecimento garantido.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>100% do material disponível</strong> para você acessar quantas vezes quiser – <strong>1 Ano de Acesso.</strong></div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Acompanhamento Pessoal por 6 meses com a Confeiteira Mariana:</strong> Suporte direto para tirar dúvidas, trocar experiências e acelerar seus resultados.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="urgency-text">
+                Restam apenas <span class="red-text">6 vagas</span> para finalizar a última turma.
+            </div>
+
+            <div class="mb-6">
+                <div class="text-center mb-4">
+                    <img src="https://cursou.site/wp-content/uploads/2025/08/MOCKUP-CONFEITACADEMY.png" 
+                         alt="Mockup dos cursos bônus" 
+                         style="max-width: 100%; height: auto; border-radius: 12px;"
+                         onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=B%C3%B4nus+Especiais'">
+                </div>
+
+                <div class="text-center mb-4">
+                    <p style="font-size: 14px; line-height: 20px; font-weight: 700;">Você ainda vai receber de bônus:</p>
+                </div>
+
+                <div class="bonus-grid">
+                    <div>
+                        <div class="bonus-item">• Geladinho Gourmet</div>
+                        <div class="bonus-item">• Ovos de Páscoa</div>
+                        <div class="bonus-item">• Salgados Lucrativos</div>
+                        <div class="bonus-item">• Balas Gourmet</div>
+                        <div class="bonus-item">• Bolos de Casamento</div>
+                        <div class="bonus-item">• Bolos de Aniversário</div>
+                        <div class="bonus-item">• Bombons Lucrativos</div>
+                        <div class="bonus-item">• Brigadeiros Gourmet</div>
+                        <div class="bonus-item">• Brownie Lucrativo</div>
+                        <div class="bonus-item">• Caseirinhos</div>
+                        <div class="bonus-item">• Receitas de Cone Trufado</div>
+                        <div class="bonus-item">• Cookies Lucrativos</div>
+                        <div class="bonus-item">• Copo da Felicidade</div>
+                    </div>
+                    <div>
+                        <div class="bonus-item">• Panetone Artesanal</div>
+                        <div class="bonus-item">• Geladinhos Alcoólicos</div>
+                        <div class="bonus-item">• Tortas Salgadas e Doces Lucrativas</div>
+                        <div class="bonus-item">• Trufas Lucrativas</div>
+                        <div class="bonus-item">• Recheios e Coberturas Exclusivas</div>
+                        <div class="bonus-item">• Bolos de Liquidificador</div>
+                        <div class="bonus-item">• Bolos de Pote</div>
+                        <div class="bonus-item">• Morango do Amor</div>
+                        <div class="bonus-item">• Mini Bolo no Acetato</div>
+                        <div class="bonus-item">• Pudim Lucrativo</div>
+                        <div class="bonus-item">• Bolo Gelado</div>
+                        <div class="bonus-item">• Brigadeiro Modelado</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="text-center mb-4">
+                    <img src="https://cursou.site/wp-content/uploads/2025/07/ChatGPT-Image-26-de-jun.-de-2025-21_39_51-1.png" 
+                         alt="Oferta especial" 
+                         style="max-width: 100%; height: auto; border-radius: 12px;"
+                         onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Oferta+Imperd%C3%ADvel'">
+                </div>
+            </div>
+
+            <a id="btn-checkout-final" href="https://confeiteira-mari.pay.yampi.com.br/r/4J284FUJKK" target="_blank" class="btn btn-success mb-4">
+                COMPRAR AGORA!
+            </a>
+
+            <div class="guarantee-text">
+                Esta compra 100% segura, 7 dias de garantia 
+            </div>
+
+            <div class="testimonial-section">
+                <h3 class="testimonial-title">Quem faz recomenda!</h3>
+                <p class="community-text">Comunidade:</p>
+                <p class="community-name">caseirinhos de porcelana !</p>
+                <p class="stats-text">
+                    <strong>94%</strong> das alunas <strong>indicam e recomendam</strong> a comunidade e curso em suas redes sociais e para conhecidos.
+                </p>
+            </div>
+
+            <div class="guarantee-badge">
+                <img src="https://cursou.site/wp-content/uploads/2025/07/garantia7dias.webp" 
+                     alt="Garantia de 7 dias"
+                     onerror="this.onerror=null; this.src='https://placehold.co/100x100/fce7f3/db2777?text=Garantia'">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let currentSlide = 0;
+        
+        const testimonialImages = [
+            "https://cursou.site/wp-content/uploads/2025/08/3.png",
+            "https://cursou.site/wp-content/uploads/2025/08/5.png",
+            "https://cursou.site/wp-content/uploads/2025/08/1-2.png",
+            "https://cursou.site/wp-content/uploads/2025/08/4.png"
+        ];
+
+        const imagesToPreload = [
+            "https://nyroll.shop/wp-content/uploads/2025/10/compressed_image_under_2mb-1-1.webp",
+            "https://cursou.site/wp-content/uploads/2025/08/compressed_image_4.png",
+            "https://cursou.site/wp-content/uploads/2025/08/compressed_image_3.png",
+            "https://cursou.site/wp-content/uploads/2025/08/compressed_image_2.png",
+            "https://cursou.site/wp-content/uploads/2025/08/compressed_image_5.png",
+            "https://cursou.site/wp-content/uploads/2025/08/MOCKUP-CONFEITACADEMY.png",
+            "https://cursou.site/wp-content/uploads/2025/07/ChatGPT-Image-26-de-jun.-de-2025-21_39_51-1.png",
+            "https://cursou.site/wp-content/uploads/2025/07/garantia7dias.webp",
+            ...testimonialImages
+        ];
+
+        imagesToPreload.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        // --- UPDATED JAVASCRIPT (Faster Transitions) ---
+
+        function nextStep() {
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            if (currentStepEl) {
+                // Add animation class to fade out
+                currentStepEl.classList.add('step-out');
+                
+                // Wait for animation to finish
+                setTimeout(() => {
+                    currentStepEl.classList.remove('active');
+                    currentStepEl.classList.remove('step-out'); // Reset for next time
+
+                    currentStep++;
+                    
+                    const nextStepEl = document.getElementById(`step-${currentStep}`);
+                    if (nextStepEl) {
+                        nextStepEl.classList.add('active'); // This will trigger the fadeInSlideUp animation
+                        window.scrollTo(0, 0); 
+                    }
+                }, 200); // This duration MUST match the fadeOutSlideUp animation (0.2s)
+            }
+        }
+
+        // New function for better UX on option buttons
+        function selectOption(btnElement) {
+            // 1. Add visual feedback
+            btnElement.classList.add('selected'); 
+            
+            // 2. Disable other buttons in the same step
+            const parentStep = btnElement.closest('.step');
+            if (parentStep) {
+                parentStep.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                });
+            }
+
+            // 3. Go to next step immediately
+            nextStep(); // This function now handles its own animation timing
+                
+            // Re-enable buttons after a delay
+            setTimeout(() => {
+                if (parentStep) {
+                    parentStep.querySelectorAll('.option-btn').forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.cursor = 'pointer';
+                    });
+                }
+                btnElement.classList.remove('selected'); // clean up
+            }, 500); // 500ms is fine, it's just for cleanup
+
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % testimonialImages.length;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + testimonialImages.length) % testimonialImages.length;
+            updateCarousel();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const img = document.getElementById('carousel-img');
+            if (img) {
+                img.src = testimonialImages[currentSlide];
+            }
+            
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                    dot.setAttribute('aria-current', 'true');
+                    dot.setAttribute('aria-label', `Slide ${index + 1} (atual)`);
+                } else {
+                    dot.classList.remove('active');
+                    dot.removeAttribute('aria-current');
+                    dot.setAttribute('aria-label', `Ir para slide ${index + 1}`);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCarousel();
+        });
+    </script>
+</body>
+</html>
